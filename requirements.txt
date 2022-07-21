@@ -1,0 +1,4 @@
+# conda create -n win-rc
+# conda activate win-rc
+pylint
+ipython
