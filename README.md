@@ -1,11 +1,12 @@
 # WIN-RC 
-
-## RC-Server config
+## WINDOWS HOST config
 
 ### Redirect VNC to RC-Server over SSH
 ```shell
 ssh -R 0.0.0.0:5900:HOSTIP:5900 -vv -N -p 25522 user@rc-server-ip
 ```
+
+## Linux RC-Server config
 
 ### Edit RC-Server to admit Gateway setting
 Edit on file `/etc/ssh/sshd_config`
