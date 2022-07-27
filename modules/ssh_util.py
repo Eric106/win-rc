@@ -1,6 +1,15 @@
-from threading import Thread
+
 from os import system
+from os.path import abspath
+from datetime import datetime
+from enum import Enum
+from threading import Thread
 from dataclasses import dataclass, field
+
+
+class sshForwardType(Enum):
+    LOCAL = 'local'
+    REMOTE = 'remote'
 
 
 class ThreadWithReturnValue(Thread):
@@ -23,23 +32,34 @@ class sshTunnelManager:
     ssh_host: str
     ssh_port: int
     ssh_key: str
-    ssh_remote_forward: str = field(default=None)
-    ssh_local_forward: str = field(default=None)
-    ssh_bin : str = "ssh/OpenSSH-Win64/ssh.exe"
+    ssh_bin : str = abspath('ssh/OpenSSH-Win64/ssh.exe')
     ssh_tunnels : dict = field(init=False)
 
     def __post_init__(self):
-        object.__setattr__(self,"ssh_tunels",dict())
-    
-    def ssh_tunnel(self):
-        connection_ssh = str()
-        port_forward = str()
-        if self.ssh_local_forward != None and self.ssh_remote_forward == None:
-            port_forward = port_forward + f"-L {self.ssh_local_forward}"
-        if self.ssh_local_forward == None and self.ssh_remote_forward != None:
-            port_forward = port_forward + f"-R {self.ssh_remote_forward}"  
+        object.__setattr__(self,"ssh_tunnels",dict())
 
-        connection_ssh = f"{self.ssh_bin} -i {self.ssh_key} {port_forward} -vv -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
-        print(connection_ssh)
-        system(connection_ssh)
+    def __tunnel_forward(self, port_forward:str, forwardType: sshForwardType) -> int:
+        if forwardType == sshForwardType.LOCAL:
+            port_forward = f"-L {port_forward}"
+        if forwardType == sshForwardType.REMOTE:
+            port_forward = f"-R {port_forward}"
+        # conn_str = f"{self.ssh_bin} -i {self.ssh_key} {port_forward} -vv -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
+        conn_str = f"{self.ssh_bin} -i {self.ssh_key} {port_forward} -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
+        print(conn_str)
+        system(conn_str)
+        return 1
         
+    def __thread_tunnel_forward(self, port_forward:str, forwardType: sshForwardType) -> ThreadWithReturnValue:
+        return ThreadWithReturnValue(
+            target=self.__tunnel_forward,
+            args=[port_forward, forwardType]
+        )
+    
+    def new_tunel_forward(self,port_forward:str, forwardType: sshForwardType) -> str:
+        thread_name = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+        self.ssh_tunnels[thread_name] = self.__thread_tunnel_forward(port_forward, forwardType)
+        self.ssh_tunnels[thread_name].start()
+        return thread_name
+
+
+    
