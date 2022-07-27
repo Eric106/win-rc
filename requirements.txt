@@ -1,5 +1,6 @@
 # conda create -n win-rc
 # conda activate win-rc
-sshtunnel
+# conda install python==3.8.13
+pyinstaller
 pylint
 ipython
