@@ -37,8 +37,9 @@ class sshTunnelManager:
         if self.ssh_local_forward != None and self.ssh_remote_forward == None:
             port_forward = port_forward + f"-L {self.ssh_local_forward}"
         if self.ssh_local_forward == None and self.ssh_remote_forward != None:
-            port_forward = port_forward + f"-L {self.ssh_remote_forward}"  
+            port_forward = port_forward + f"-R {self.ssh_remote_forward}"  
 
-        connection_ssh = f"{self.ssh_bin} -i {self.ssh_key} -vv -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
+        connection_ssh = f"{self.ssh_bin} -i {self.ssh_key} {port_forward} -vv -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
+        print(connection_ssh)
         system(connection_ssh)
         
