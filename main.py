@@ -12,10 +12,7 @@ server = SSH_U.sshTunnelManager(
 )
 
 try:
-    t_name = server.new_tunel_forward(
-        '0.0.0.0:5900:192.168.0.175:5900',
-        SSH_U.sshForwardType.REMOTE
-    )
+    t_name = server.new_tunel_forward('0.0.0.0:5900:192.168.0.175:5900',SSH_U.sshForwardType.REMOTE)
     print(t_name)
     sleep(20)
     server.ssh_tunnels[t_name].stop()
