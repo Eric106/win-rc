@@ -1,9 +1,8 @@
-
-from os import system
+from subprocess import Popen
 from os.path import abspath
 from datetime import datetime
 from enum import Enum
-from threading import Thread
+from threading import Thread, Event, current_thread
 from dataclasses import dataclass, field
 
 
@@ -17,10 +16,15 @@ class ThreadWithReturnValue(Thread):
                  args=(), kwargs={}, Verbose=None):
         Thread.__init__(self, group, target, name, args, kwargs)
         self._return = None
+        self._stop = Event()
     def run(self):
         # print(type(self._target))
         if self._target is not None:
             self._return = self._target(*self._args, **self._kwargs)
+    def stopped(self):
+        return self._stop.isSet()
+    def stop(self):
+        self._stop.set()
     def join(self, *args):
         Thread.join(self, *args)
         return self._return
@@ -38,16 +42,21 @@ class sshTunnelManager:
     def __post_init__(self):
         object.__setattr__(self,"ssh_tunnels",dict())
 
-    def __tunnel_forward(self, port_forward:str, forwardType: sshForwardType) -> int:
+    def __tunnel_forward(self, port_forward:str, forwardType: sshForwardType):
         if forwardType == sshForwardType.LOCAL:
             port_forward = f"-L {port_forward}"
         if forwardType == sshForwardType.REMOTE:
             port_forward = f"-R {port_forward}"
-        # conn_str = f"{self.ssh_bin} -i {self.ssh_key} {port_forward} -vv -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
-        conn_str = f"{self.ssh_bin} -i {self.ssh_key} {port_forward} -NT -p {self.ssh_port} {self.ssh_user}@{self.ssh_host}"
-        print(conn_str)
-        system(conn_str)
-        return 1
+        ssh_command = [self.ssh_bin,
+                    '-i', self.ssh_key, port_forward,
+                    '-NT' ,'-p', str(self.ssh_port),
+                    f'{self.ssh_user}@{self.ssh_host}']
+        print(ssh_command)
+        ssh_command = Popen(ssh_command)
+        while True:
+            if current_thread().stopped():
+                ssh_command.kill()
+                break               
         
     def __thread_tunnel_forward(self, port_forward:str, forwardType: sshForwardType) -> ThreadWithReturnValue:
         return ThreadWithReturnValue(
