@@ -50,7 +50,9 @@ class sshTunnelManager:
         ssh_command = [self.ssh_bin,
                     '-i', self.ssh_key, port_forward,
                     '-NT' ,'-p', str(self.ssh_port),
+                    '-o', '"StrictHostKeyChecking no"',
                     f'{self.ssh_user}@{self.ssh_host}']
+        ssh_command = " ".join(ssh_command)
         print(ssh_command)
         ssh_command = Popen(ssh_command)
         while True:
