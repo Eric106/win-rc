@@ -7,8 +7,8 @@ from dataclasses import dataclass, field
 
 
 class sshForwardType(Enum):
-    LOCAL = 'local'
-    REMOTE = 'remote'
+    LOCAL = '-L'
+    REMOTE = '-R'
 
 
 class ThreadWithReturnValue(Thread):
@@ -43,10 +43,7 @@ class sshTunnelManager:
         object.__setattr__(self,"ssh_tunnels",dict())
 
     def __tunnel_forward(self, port_forward:str, forwardType: sshForwardType):
-        if forwardType == sshForwardType.LOCAL:
-            port_forward = f"-L {port_forward}"
-        if forwardType == sshForwardType.REMOTE:
-            port_forward = f"-R {port_forward}"
+        port_forward = f"{forwardType.value} {port_forward}"
         ssh_command = [self.ssh_bin,
                     '-i', self.ssh_key, port_forward,
                     '-NT' ,'-p', str(self.ssh_port),

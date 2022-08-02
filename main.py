@@ -6,7 +6,7 @@ from modules import ssh_util as SSH_U
 
 user_folder = getenv('USERPROFILE').replace('\\','/')
 server = SSH_U.sshTunnelManager(
-    ssh_host='192.168.0.171',
+    ssh_host='eserv.ddns.net',
     ssh_port=25522,
     ssh_user='tunel',
     ssh_key=user_folder+'/.ssh/eserv.ddns.net-tunel.pem',
