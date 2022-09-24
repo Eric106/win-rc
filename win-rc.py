@@ -5,7 +5,6 @@ from modules import ssh_util as SSH_U
 from modules import ip_util as IPU
 
 
-
 default_ip = IPU.get_default_ip()
 server = SSH_U.sshTunnelManager(
     ssh_host='eserv.ddns.net',
