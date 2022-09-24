@@ -36,7 +36,7 @@ class sshTunnelManager:
     ssh_host: str
     ssh_port: int
     ssh_key: str
-    ssh_bin : str = abspath('ssh/OpenSSH-Win64/ssh.exe')
+    ssh_bin : str = abspath('bin/ssh/OpenSSH-Win64/ssh.exe')
     ssh_tunnels : dict = field(init=False)
 
     def __post_init__(self):
