@@ -1,21 +1,23 @@
 import sys
-from os import getenv, system
+from os import system
 from time import sleep
 from modules import ssh_util as SSH_U
+from modules import ip_util as IPU
 
 
-user_folder = getenv('USERPROFILE').replace('\\','/')
+
+default_ip = IPU.get_default_ip()
 server = SSH_U.sshTunnelManager(
     ssh_host='eserv.ddns.net',
     ssh_port=25522,
     ssh_user='tunel',
-    ssh_key=user_folder+'/.ssh/eserv.ddns.net-tunel.pem',
+    ssh_key='keys/eserv.ddns.net-tunel.pem',
 )
 
 t_name : str = ''
 try:
     t_name = server.new_tunel_forward(
-        '0.0.0.0:5900:10.0.2.15:5900',
+        f'0.0.0.0:5900:{default_ip}:5900',
         SSH_U.sshForwardType.REMOTE)
     while True:
         system(f'netstat -np TCP | find "{server.ssh_port}"')

@@ -4,3 +4,4 @@
 pyinstaller
 pylint
 ipython
+netifaces
