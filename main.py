@@ -12,9 +12,10 @@ server = SSH_U.sshTunnelManager(
     ssh_key=user_folder+'/.ssh/eserv.ddns.net-tunel.pem',
 )
 
+t_name : str = ''
 try:
     t_name = server.new_tunel_forward(
-        '0.0.0.0:5900:192.168.0.175:5900',
+        '0.0.0.0:5900:10.0.2.15:5900',
         SSH_U.sshForwardType.REMOTE)
     while True:
         system(f'netstat -np TCP | find "{server.ssh_port}"')
