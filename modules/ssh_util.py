@@ -51,7 +51,7 @@ class sshTunnelManager:
         ssh_command = [self.ssh_bin,
                     '-i', self.ssh_key, port_forward,
                     '-NT' ,'-p', str(self.ssh_port),
-                    '-o', 'StrictHostKeyChecking=no ',
+                    '-o', 'StrictHostKeyChecking=no',
                     f'{self.ssh_user}@{self.ssh_host}']
         print(" ".join(ssh_command))
         ssh_command = Popen(ssh_command)
