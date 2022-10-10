@@ -1,3 +1,4 @@
+import platform
 from subprocess import Popen
 from os.path import abspath
 from datetime import datetime
@@ -36,10 +37,13 @@ class sshTunnelManager:
     ssh_host: str
     ssh_port: int
     ssh_key: str
-    ssh_bin : str = abspath('bin/ssh/OpenSSH-Win64/ssh.exe')
+    ssh_bin : str = field(init=False)
     ssh_tunnels : dict = field(init=False)
 
     def __post_init__(self):
+        object.__setattr__(self,"ssh_bin",
+            abspath('bin/ssh/OpenSSH-Win64/ssh.exe') if platform.system() == 'Windows' else '/usr/bin/ssh'
+        )
         object.__setattr__(self,"ssh_tunnels",dict())
 
     def __tunnel_forward(self, port_forward:str, forwardType: sshForwardType):
@@ -47,10 +51,9 @@ class sshTunnelManager:
         ssh_command = [self.ssh_bin,
                     '-i', self.ssh_key, port_forward,
                     '-NT' ,'-p', str(self.ssh_port),
-                    '-o', '"StrictHostKeyChecking no"',
+                    '-o', 'StrictHostKeyChecking=no ',
                     f'{self.ssh_user}@{self.ssh_host}']
-        ssh_command = " ".join(ssh_command)
-        print(ssh_command)
+        print(" ".join(ssh_command))
         ssh_command = Popen(ssh_command)
         while True:
             if current_thread().stopped():
